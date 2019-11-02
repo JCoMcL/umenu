@@ -4,6 +4,10 @@
 #include <string.h>
 #include <stdlib.h>
 
+#define COLOR(s) "\e[96m" s "\e[39m"
+#define BOLD(s) "\e[1m" s "\e[22m"
+#define RED(s) "\e[31m" s "\e[39m"
+
 static struct termios tio_old;
 
 struct Option {
@@ -30,7 +34,7 @@ void cleanup(void) {
 
 
 void die(const char *s) {
-	fprintf(stderr, "%s\n", s);
+	fprintf(stderr, RED("%s\n"), s);
 	cleanup();
 	exit(1);
 }
@@ -48,7 +52,9 @@ void genOptions() {
 
 		char key = getKeyFromIndex(i);
 		if (!key){
-			fprintf(stderr, "Warning! Maximum options (%i) reached\n", i-1);
+			fprintf(stderr,
+				RED("Warning! Maximum options (") "%i" RED(") reached\n"),
+				i-1);
 			return;
 		}
 		opt.key = key;
@@ -61,7 +67,7 @@ void genOptions() {
 		}
 
 		options[i] = opt;
-		fprintf(stderr, "%c %s\n", options[i].key, options[i].text);
+		fprintf(stderr, BOLD("["COLOR("%c")"]") " %s\n", options[i].key, options[i].text);
 		option_count = i + 1;
 }	}
 
