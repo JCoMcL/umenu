@@ -18,9 +18,9 @@ static struct Option *options = NULL;
 static int option_count;
 
 char getKeyFromIndex(int i) {
-	if (i < 9) {		return '1' + i;}
+	if (i < 9) {		return '1' + i;} //chars '1'-'9'
 	else if (i == 9) {	return '0';}
-	else if (i < 36) {	return 'a' + i - 10;}
+	else if (i < 36) {	return 'a' + i - 10;} //chars 'a'-'z'
 	else {			return '\0';}
 }
 
