@@ -1,11 +1,12 @@
-INSTALLDIR = /usr/bin
+PREFIX = /usr
 all: menu.o
 
 menu.o:
 	$(CC) -o menu.o menu.c
 install: menu.o
-	cp menu.o $(INSTALLDIR)/umenu
+	mkdir -p $(DESTDIR)$(PREFIX)/bin
+	cp menu.o $(DESTDIR)$(PREFIX)/bin/umenu
 uninstall:
-	rm -f $(INSTALLDIR)/umenu
+	rm -f $(DESTDIR)$(PREFIX)/umenu
 clean:
 	rm -f menu.o
