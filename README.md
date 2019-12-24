@@ -4,6 +4,7 @@ A simple menu (à-la dmenu or slmenu) designed around a single-keypress mantra. 
 Useful for repetitive user-input tasks like categorising training data or or organising media into directories.
 ## Installation
 run `make install` from the source directory (with root if neccesary)
+or install from the [AUR](https://aur.archlinux.org/umenu.git) for Arch users
 ## Example usage
 Navigate to a subdirectory:
 ```shell
