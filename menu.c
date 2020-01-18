@@ -17,6 +17,19 @@ struct Option {
 static struct Option *options = NULL;
 static int option_count;
 
+void genOptions();
+void cleanup(void);
+const char *getOptionFromInput(void);
+
+int main() {
+	//readargs();
+	genOptions();
+	puts(getOptionFromInput());
+
+	cleanup();
+	return 0;
+}
+
 char getKeyFromIndex(int i) {
 	if (i < 9) {		return '1' + i;} //chars '1'-'9'
 	else if (i == 9) {	return '0';}
@@ -107,11 +120,3 @@ const char *getOptionFromInput(void) {
 			fprintf(stderr, "Invalid Character: %c\n", c);
 }	}	}
 
-int main() {
-	//readargs();
-	genOptions();
-	puts(getOptionFromInput());
-
-	cleanup();
-	return 0;
-}
