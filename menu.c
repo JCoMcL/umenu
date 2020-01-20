@@ -20,7 +20,7 @@ static int option_count;
 void genOptions();
 const char *getOptionFromInput(void);
 char getKeyFromIndex(int i);
-const char *getOptionFromInput(void);
+char getUserInput(void);
 const char *findOption(char c);
 void cleanup(void);
 void die(const char *s);
@@ -29,8 +29,12 @@ const char *findOption(char c);
 int main() {
 	//readargs();
 	genOptions();
-	puts(getOptionFromInput());
+	const char *output;
 
+	for (char c = getUserInput(); !(output=findOption(c)); c = getUserInput()) {
+		fprintf(stderr, "Invalid Character: %c\n", c);
+	}
+	puts(output);
 	cleanup();
 	return 0;
 }
@@ -73,7 +77,7 @@ char getKeyFromIndex(int i) {
 	else {			return '\0';}
 }
 
-const char *getOptionFromInput(void) {
+char getUserInput(void) {
 	/* reopen stdin for user input */
 	if (freopen("/dev/tty", "r", stdin) == NULL) {
 		die("Can't reopen tty.");
@@ -91,14 +95,10 @@ const char *getOptionFromInput(void) {
 	tcsetattr(0, TCSANOW, &tio_new);
 
 	char c;
-	while(1) {
-		read(0, &c, 1);
-		const char *out = findOption(c);
-		if (out) {
-			return out;
-		} else {
-			fprintf(stderr, "Invalid Character: %c\n", c);
-}	}	}
+	read(0, &c, 1);
+	tcsetattr(0, TCSANOW, &tio_old);
+	return c;
+}
 
 const char *findOption(char c) {
 	int i;
@@ -122,5 +122,3 @@ void die(const char *s) {
 	cleanup();
 	exit(1);
 }
-
-/* read stdin and initialize global array of options */
