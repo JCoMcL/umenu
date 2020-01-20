@@ -18,8 +18,13 @@ static struct Option *options = NULL;
 static int option_count;
 
 void genOptions();
-void cleanup(void);
 const char *getOptionFromInput(void);
+char getKeyFromIndex(int i);
+const char *getOptionFromInput(void);
+const char *findOption(char c);
+void cleanup(void);
+void die(const char *s);
+const char *findOption(char c);
 
 int main() {
 	//readargs();
@@ -30,29 +35,6 @@ int main() {
 	return 0;
 }
 
-char getKeyFromIndex(int i) {
-	if (i < 9) {		return '1' + i;} //chars '1'-'9'
-	else if (i == 9) {	return '0';}
-	else if (i < 36) {	return 'a' + i - 10;} //chars 'a'-'z'
-	else {			return '\0';}
-}
-
-void cleanup(void) {
-	if (tio_old.c_lflag) {
-		tcsetattr(0, TCSANOW, &tio_old);
-	}
-	if (options); {
-		free(options);
-}	}
-
-
-void die(const char *s) {
-	fprintf(stderr, RED("%s\n"), s);
-	cleanup();
-	exit(1);
-}
-
-/* read stdin and initialize global array of options */
 void genOptions() {
 	char buf[BUFSIZ];
 	for (int i = 0; fgets(buf, sizeof buf, stdin); i++) {
@@ -84,14 +66,12 @@ void genOptions() {
 		option_count = i + 1;
 }	}
 
-const char *findOption(char c) {
-	int i;
-	for (i = 0; i < option_count && (options[i].key != c); i++) {}
-	if (i < option_count) {
-		return options[i].text;
-	} else {
-		return NULL;
-}	}
+char getKeyFromIndex(int i) {
+	if (i < 9) {		return '1' + i;} //chars '1'-'9'
+	else if (i == 9) {	return '0';}
+	else if (i < 36) {	return 'a' + i - 10;} //chars 'a'-'z'
+	else {			return '\0';}
+}
 
 const char *getOptionFromInput(void) {
 	/* reopen stdin for user input */
@@ -120,3 +100,27 @@ const char *getOptionFromInput(void) {
 			fprintf(stderr, "Invalid Character: %c\n", c);
 }	}	}
 
+const char *findOption(char c) {
+	int i;
+	for (i = 0; i < option_count && (options[i].key != c); i++) {}
+	if (i < option_count) {
+		return options[i].text;
+	} else {
+		return NULL;
+}	}
+
+void cleanup(void) {
+	if (tio_old.c_lflag) {
+		tcsetattr(0, TCSANOW, &tio_old);
+	}
+	if (options); {
+		free(options);
+}	}
+
+void die(const char *s) {
+	fprintf(stderr, RED("%s\n"), s);
+	cleanup();
+	exit(1);
+}
+
+/* read stdin and initialize global array of options */
