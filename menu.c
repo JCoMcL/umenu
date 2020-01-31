@@ -8,7 +8,6 @@
 #define BOLD(s) "\e[1m" s "\e[22m"
 #define RED(s) "\e[31m" s "\e[39m"
 
-static struct termios tio_old;
 
 struct Option {
 	char key;
@@ -83,6 +82,7 @@ char getUserInput(void) {
 		die("Can't reopen tty.");
 	}
 	
+	struct termios tio_old;
 	tcgetattr(0, &tio_old);
 	struct termios tio_new = tio_old;
 	/* disable unwanted attributes */
@@ -110,9 +110,6 @@ const char *findOption(char c) {
 }	}
 
 void cleanup(void) {
-	if (tio_old.c_lflag) {
-		tcsetattr(0, TCSANOW, &tio_old);
-	}
 	if (options); {
 		free(options);
 }	}
