@@ -1,0 +1,11 @@
+.TH UMENU 1
+.SH NAME
+umenu \- single\-keypress menu
+.SH SYNOPSIS
+.B umenu
+.SH DESCRIPTION
+.B umenu
+reads newline-separated items from stdin and assigns a keyboard key to each item. By default, the keys 1-9, 0, a-z are used. If the number of items read in from stdin exceeds the number of availiable keys (35 by default), all items after the maximum will be excluded. When the presses a key which matches an avaialble option, the corresponding option is writen to stdout and the program terminates. 
+.SH OPTIONS
+.TP
+This program currently does not have any options
