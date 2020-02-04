@@ -8,37 +8,33 @@
 #define BOLD(s) "\e[1m" s "\e[22m"
 #define RED(s) "\e[31m" s "\e[39m"
 
-
 struct Option {
 	char key;
 	char *text;
 };
-static struct Option *options = NULL;
 static int option_count;
 
-void genOptions();
+struct Option *getOptions();
 const char *getOptionFromInput(void);
 char getKeyFromIndex(int i);
 char getUserInput(void);
-const char *findOption(char c);
-void cleanup(void);
+const char *findOption(struct Option *options, char c);
 void die(const char *s);
-const char *findOption(char c);
 
 int main() {
-	//readargs();
-	genOptions();
+	struct Option *options = getOptions();
 	const char *output;
 
-	for (char c = getUserInput(); !(output=findOption(c)); c = getUserInput()) {
+	for (char c = getUserInput(); !(output=findOption(options, c)); c = getUserInput()) {
 		fprintf(stderr, "Invalid Character: %c\n", c);
 	}
 	puts(output);
-	cleanup();
+	free(options);
 	return 0;
 }
 
-void genOptions() {
+struct Option *getOptions() {
+	struct Option *options = NULL;
 	char buf[BUFSIZ];
 	for (int i = 0; fgets(buf, sizeof buf, stdin); i++) {
 		struct Option opt;
@@ -53,7 +49,7 @@ void genOptions() {
 			fprintf(stderr,
 				RED("Warning! Maximum options (") "%i" RED(") reached\n"),
 				i-1);
-			return;
+			return options;
 		}
 		opt.key = key;
 		
@@ -61,13 +57,16 @@ void genOptions() {
 		
 		options = realloc(options, sizeof(struct Option) * (i + 1));
 		if (!options) {
+			free(options);
 			die("Can't realloc");
 		}
 
 		options[i] = opt;
 		fprintf(stderr, BOLD("["COLOR("%c")"]") " %s\n", options[i].key, options[i].text);
 		option_count = i + 1;
-}	}
+	}
+	return options;
+}
 
 char getKeyFromIndex(int i) {
 	if (i < 9) {		return '1' + i;} //chars '1'-'9'
@@ -100,7 +99,7 @@ char getUserInput(void) {
 	return c;
 }
 
-const char *findOption(char c) {
+const char *findOption(struct Option *options, char c) {
 	int i;
 	for (i = 0; i < option_count && (options[i].key != c); i++) {}
 	if (i < option_count) {
@@ -109,13 +108,7 @@ const char *findOption(char c) {
 		return NULL;
 }	}
 
-void cleanup(void) {
-	if (options); {
-		free(options);
-}	}
-
 void die(const char *s) {
 	fprintf(stderr, RED("%s\n"), s);
-	cleanup();
 	exit(1);
 }
