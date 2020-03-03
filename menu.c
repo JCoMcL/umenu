@@ -86,9 +86,9 @@ char getUserInput(void) {
 	struct termios tio_new = tio_old;
 	/* disable unwanted attributes */
 	tio_new.c_lflag &= ~(
-			ICANON| //reads input per line rather than per character
-			ECHO //echoes the typed input
-			); 
+		ICANON| //reads input per line rather than per character
+		ECHO //echoes the typed input
+	); 
 	tio_new.c_cc[VMIN]=1; //require minimum of 1 char
 
 	tcsetattr(0, TCSANOW, &tio_new);
