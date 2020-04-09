@@ -3,7 +3,6 @@
 #include <termios.h>
 #include <string.h>
 #include <stdlib.h>
-#include <assert.h> //TODO remove before publishing
 
 #define COLOR(s) "\e[96m" s "\e[39m"
 #define BOLD(s) "\e[1m" s "\e[22m"
