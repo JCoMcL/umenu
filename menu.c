@@ -3,6 +3,7 @@
 #include <termios.h>
 #include <string.h>
 #include <stdlib.h>
+#include <assert.h> //TODO remove before publishing
 
 #define COLOR(s) "\e[96m" s "\e[39m"
 #define BOLD(s) "\e[1m" s "\e[22m"
@@ -11,8 +12,8 @@
 struct Option {
 	char key;
 	char *text;
+   struct Option *next;
 };
-static int option_count;
 
 struct Option *getOptions();
 const char *getOptionFromInput(void);
@@ -20,6 +21,7 @@ char getKeyFromIndex(int i);
 char getUserInput(void);
 const char *findOption(struct Option *options, char c);
 void die(const char *s);
+void freeOptions(struct Option *options);
 
 int main() {
 	struct Option *options = getOptions();
@@ -29,15 +31,15 @@ int main() {
 		fprintf(stderr, "Invalid Character: %c\n", c);
 	}
 	puts(output);
-	free(options);
+	freeOptions(options);
 	return 0;
 }
 
 struct Option *getOptions() {
 	struct Option *options = NULL;
+   struct Option *prev = NULL;
 	char buf[BUFSIZ];
 	for (int i = 0; fgets(buf, sizeof buf, stdin); i++) {
-		struct Option opt;
 		/* remove trailing newline */
 		char *p = strchr(buf, '\n');
 		if (p) {
@@ -51,19 +53,25 @@ struct Option *getOptions() {
 				i-1);
 			return options;
 		}
-		opt.key = key;
-		
-		opt.text = strdup(buf);
-		
-		options = realloc(options, sizeof(struct Option) * (i + 1));
-		if (!options) {
-			free(options);
-			die("Can't realloc");
-		}
 
-		options[i] = opt;
-		fprintf(stderr, BOLD("["COLOR("%c")"]") " %s\n", options[i].key, options[i].text);
-		option_count = i + 1;
+      struct Option *curr = malloc(sizeof(struct Option));
+		if (!curr) {
+         if (options)
+            {freeOptions(options);}
+			die("Can't malloc");
+		}
+		curr->key = key;
+		curr->text = strdup(buf);
+
+      if (prev)
+         {prev->next = curr;}
+      else
+         {options = curr;} //first iteration; assign curr as the list head
+		
+
+		prev = curr;
+		fprintf(stderr, BOLD("["COLOR("%c")"]") " %s\n", prev->key, prev->text);
+
 	}
 	return options;
 }
@@ -100,10 +108,10 @@ char getUserInput(void) {
 }
 
 const char *findOption(struct Option *options, char c) {
-	int i;
-	for (i = 0; i < option_count && (options[i].key != c); i++) {}
-	if (i < option_count) {
-		return options[i].text;
+	struct Option *o;
+	for (o = options; o != NULL && (o->key != c); o = o->next) {}
+	if (o != NULL) {
+		return o->text;
 	} else {
 		return NULL;
 }	}
@@ -111,4 +119,13 @@ const char *findOption(struct Option *options, char c) {
 void die(const char *s) {
 	fprintf(stderr, RED("%s\n"), s);
 	exit(1);
+}
+
+void freeOptions(struct Option *options) {
+   struct Option *tmp;
+   while (options != NULL) {
+      tmp = options;
+      options = options->next;
+      free(tmp);
+   }
 }
