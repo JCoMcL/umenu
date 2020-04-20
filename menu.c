@@ -61,6 +61,7 @@ struct Option *getOptions() {
 		}
 		curr->key = key;
 		curr->text = strdup(buf);
+      curr->next = NULL;
 
       if (prev)
          {prev->next = curr;}
