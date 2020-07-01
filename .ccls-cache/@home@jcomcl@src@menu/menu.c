@@ -15,6 +15,7 @@ struct Option {
 };
 
 struct Option *getOptions();
+void displayOptions(struct Option *options);
 const char *getOptionFromInput(void);
 char getKeyFromIndex(int i);
 char getUserInput(void);
@@ -24,6 +25,7 @@ void freeOptions(struct Option *options);
 
 int main() {
 	struct Option *options = getOptions();
+	displayOptions(options);
 	const char *output;
 
 	for (char c = getUserInput(); !(output=findOption(options, c)); c = getUserInput()) {
@@ -70,10 +72,15 @@ struct Option *getOptions() {
 		
 
 		prev = curr;
-		fprintf(stderr, BOLD("["COLOR("%c")"]") " %s\n", prev->key, prev->text);
-
+		//fprintf(stderr, BOLD("["COLOR("%c")"]") " %s\n", prev->key, prev->text);
 	}
 	return options;
+}
+
+void displayOptions(struct Option *options) {
+	for(struct Option *o = options; o; o = o->next) {
+		fprintf(stderr, BOLD("["COLOR("%c")"]") " %s\n", o->key, o->text);
+	}
 }
 
 char getKeyFromIndex(int i) {
