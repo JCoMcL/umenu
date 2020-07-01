@@ -25,6 +25,12 @@ void freeOptions(struct Option *options);
 
 int main() {
 	struct Option *options = getOptions();
+
+	//if there is only one option, output it and skip user selection
+	if (! options->next) {
+		printf("%s\n", options->text);
+		return 0;
+	}
 	displayOptions(options);
 	const char *output;
 
@@ -70,9 +76,7 @@ struct Option *getOptions() {
 		else
 			{options = curr;} //first iteration; assign curr as the list head
 		
-
 		prev = curr;
-		//fprintf(stderr, BOLD("["COLOR("%c")"]") " %s\n", prev->key, prev->text);
 	}
 	return options;
 }
