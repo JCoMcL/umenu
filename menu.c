@@ -23,6 +23,12 @@ const char *findOption(struct Option *options, char c);
 void die(const char *s);
 void freeOptions(struct Option *options);
 
+// -n: no newline
+// -q: quit if maximum options reached
+// -s: (don't) skip if only one option is present
+// -S: skip verbosely if only one options is present
+// -d: display this string at the top of the menu if the menu is printed
+// -c: use this string to map characters to options instead of the default getKeyFromIndex
 int main() {
 	struct Option *options = getOptions();
 
