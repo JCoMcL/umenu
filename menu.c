@@ -32,6 +32,9 @@ void freeOptions(struct Option *options);
 int main() {
 	struct Option *options = getOptions();
 
+	if (! options) {
+		return 1;
+	}
 	//if there is only one option, output it and skip user selection
 	if (! options->next) {
 		printf("%s\n", options->text);
