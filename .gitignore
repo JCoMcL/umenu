@@ -1,1 +1,2 @@
-menu.o
+*.o
+.ccls-cache
