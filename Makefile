@@ -19,4 +19,7 @@ uninstall:
 clean:
 	rm -f menu.o
 
-.PHONY: all install uninstall clean
+push:
+	git push origin --tags
+
+.PHONY: all install uninstall clean push
