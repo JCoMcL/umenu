@@ -26,7 +26,6 @@ const char *findOption(struct Option *options, char c);
 void die(const char *s);
 void freeOptions(struct Option *options);
 
-// -n: no newline
 // -s: (don't) skip if only one option is present
 // -S: skip verbosely if only one options is present
 // -d: display this string at the top of the menu if the menu is printed
@@ -34,10 +33,13 @@ void freeOptions(struct Option *options);
 int main(int argc, char *argv[]) {
 	// options
 	outOfKeysCallback ook = printOutOfKeysError;
+	const char *outputTerminator = "\n";
 
 	// arguments
 	for(int i = 1; i < argc; i++) {
-		if (!strcmp(argv[i], "-q") || !strcmp(argv[i], "--quit-on-full"))
+		if (!strcmp(argv[i], "-n") || !strcmp(argv[i], "--no-newline"))
+			outputTerminator = "";
+		else if (!strcmp(argv[i], "-q") || !strcmp(argv[i], "--quit-on-full"))
 			ook = NULL;
 	}
 
@@ -57,7 +59,7 @@ int main(int argc, char *argv[]) {
 	for (char c = getUserInput(); !(output=findOption(options, c)); c = getUserInput()) {
 		fprintf(stderr, "Invalid Character: %c\n", c);
 	}
-	puts(output);
+	fprintf(stdout, "%s%s", output, outputTerminator);
 	freeOptions(options);
 	return 0;
 }
