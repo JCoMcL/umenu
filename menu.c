@@ -6,7 +6,7 @@
 
 #define COLOR(s) "\e[96m" s "\e[39m"
 #define BOLD(s) "\e[1m" s "\e[22m"
-#define RED(s) "\e[31m" s "\e[39m"
+#define RED(s) "\e[91m" s "\e[39m"
 
 struct Option {
 	char key;
@@ -14,7 +14,10 @@ struct Option {
 	struct Option *next;
 };
 
+typedef struct Option *(*outOfKeysCallback)(struct Option*);
+
 struct Option *getOptions();
+struct Option *printOutOfKeysError(struct Option *options);
 void displayOptions(struct Option *options);
 const char *getOptionFromInput(void);
 char getKeyFromIndex(int i);
@@ -30,7 +33,7 @@ void freeOptions(struct Option *options);
 // -d: display this string at the top of the menu if the menu is printed
 // -c: use this string to map characters to options instead of the default getKeyFromIndex
 int main() {
-	struct Option *options = getOptions();
+	struct Option *options = getOptions(printOutOfKeysError);
 
 	if (! options) {
 		return 1;
@@ -51,7 +54,7 @@ int main() {
 	return 0;
 }
 
-struct Option *getOptions() {
+struct Option *getOptions(outOfKeysCallback ook) {
 	struct Option *options = NULL;
 	struct Option *prev = NULL;
 	char buf[BUFSIZ];
@@ -64,10 +67,11 @@ struct Option *getOptions() {
 
 		char key = getKeyFromIndex(i);
 		if (!key){
-			fprintf(stderr,
-				RED("Warning! Maximum options (") "%i" RED(") reached\n"),
-				i-1);
-			return options;
+			if (ook == NULL) {
+				die(NULL);
+			} else {
+				return ook(options);
+			}
 		}
 
 		struct Option *curr = malloc(sizeof(struct Option));
@@ -87,6 +91,13 @@ struct Option *getOptions() {
 		
 		prev = curr;
 	}
+	return options;
+}
+
+struct Option *printOutOfKeysError(struct Option *options) {
+	int optionCount=0;
+	for (struct Option *curr=options; curr=curr->next; optionCount++){}
+	fprintf(stderr, RED("Warning! Maximum options (") "%i" RED(") reached\n"), optionCount);
 	return options;
 }
 
@@ -137,7 +148,7 @@ const char *findOption(struct Option *options, char c) {
 }	}
 
 void die(const char *s) {
-	fprintf(stderr, RED("%s\n"), s);
+	if(s) { fprintf(stderr, RED("%s\n"), s);}
 	exit(1);
 }
 
