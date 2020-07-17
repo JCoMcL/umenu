@@ -28,7 +28,6 @@ void die(const char *s);
 void freeOptions(struct Option *options);
 
 // -d: display this string at the top of the menu if the menu is printed
-// -c: use this string to map characters to options instead of the default getKeyFromIndex
 int main(int argc, char *argv[]) {
 	// options
 	const char *keyString = "1234567890abcdefghijklmnopqrstuvwxyz";
@@ -39,7 +38,10 @@ int main(int argc, char *argv[]) {
 
 	// arguments
 	for(int i = 1; i < argc; i++) {
-		if (!strcmp(argv[i], "-n") || !strcmp(argv[i], "--no-newline"))
+		if (!strcmp(argv[i], "-k") || !strcmp(argv[i], "--keys")){
+			if (i != argc)
+				keyString = argv[++i];
+		} else if (!strcmp(argv[i], "-n") || !strcmp(argv[i], "--no-newline"))
 			outputTerminator = "";
 		else if (!strcmp(argv[i], "-q") || !strcmp(argv[i], "--quit-on-full"))
 			ook = NULL;
