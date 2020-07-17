@@ -27,10 +27,10 @@ const char *findOption(struct Option *options, char c);
 void die(const char *s);
 void freeOptions(struct Option *options);
 
-// -d: display this string at the top of the menu if the menu is printed
 int main(int argc, char *argv[]) {
 	// options
-	const char *keyString = NULL
+	const char *displayString = "";
+	const char *keyString = NULL;
 	outOfKeysCallback ook = printOutOfKeysError;
 	const char *outputTerminator = "\n";
 	bool skipIfOneOption = false;
@@ -38,7 +38,10 @@ int main(int argc, char *argv[]) {
 
 	// arguments
 	for(int i = 1; i < argc; i++) {
-		if (!strcmp(argv[i], "-k") || !strcmp(argv[i], "--keys")){
+		if (!strcmp(argv[i], "-d") || !strcmp(argv[i], "--display")){
+			if (i != argc)
+				displayString = argv[++i];
+		} else if (!strcmp(argv[i], "-k") || !strcmp(argv[i], "--keys")){
 			if (i != argc)
 				keyString = argv[++i];
 		} else if (!strcmp(argv[i], "-n") || !strcmp(argv[i], "--no-newline"))
@@ -65,6 +68,9 @@ int main(int argc, char *argv[]) {
 		printf("%s\n", options->text);
 		return 0;
 	}
+
+	if (*displayString) 
+		fprintf(stderr, "%s\n", displayString);
 	displayOptions(options);
 	const char *output;
 
