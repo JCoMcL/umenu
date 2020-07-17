@@ -21,7 +21,7 @@ struct Option *getOptions();
 struct Option *printOutOfKeysError(struct Option *options);
 void displayOptions(struct Option *options);
 const char *getOptionFromInput(void);
-char getKeyFromIndex(int i);
+char getKeyFromIndex(int i, const char *keyString);
 char getUserInput(void);
 const char *findOption(struct Option *options, char c);
 void die(const char *s);
@@ -31,6 +31,7 @@ void freeOptions(struct Option *options);
 // -c: use this string to map characters to options instead of the default getKeyFromIndex
 int main(int argc, char *argv[]) {
 	// options
+	const char *keyString = "1234567890abcdefghijklmnopqrstuvwxyz";
 	outOfKeysCallback ook = printOutOfKeysError;
 	const char *outputTerminator = "\n";
 	bool skipIfOneOption = false;
@@ -50,7 +51,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-	struct Option *options = getOptions(ook);
+	struct Option *options = getOptions(ook, keyString);
 
 	if (! options) {
 		return 1;
@@ -73,7 +74,7 @@ int main(int argc, char *argv[]) {
 	return 0;
 }
 
-struct Option *getOptions(outOfKeysCallback ook) {
+struct Option *getOptions(outOfKeysCallback ook, const char *keyString) {
 	struct Option *options = NULL;
 	struct Option *prev = NULL;
 	char buf[BUFSIZ];
@@ -84,7 +85,7 @@ struct Option *getOptions(outOfKeysCallback ook) {
 			*p = '\0';
 		}
 
-		char key = getKeyFromIndex(i);
+		char key = getKeyFromIndex(i, keyString);
 		if (!key){
 			if (ook == NULL) {
 				die(NULL);
@@ -126,11 +127,15 @@ void displayOptions(struct Option *options) {
 	}
 }
 
-char getKeyFromIndex(int i) {
-	if (i < 9) {		return '1' + i;} //chars '1'-'9'
-	else if (i == 9) {	return '0';}
-	else if (i < 36) {	return 'a' + i - 10;} //chars 'a'-'z'
-	else {			return '\0';}
+char getKeyFromIndex(int i, const char *keyString) {
+	if (!keyString) {
+		if (i < 9) {		return '1' + i;} //chars '1'-'9'
+		else if (i == 9) {	return '0';}
+		else if (i < 36) {	return 'a' + i - 10;} //chars 'a'-'z'
+		else {			return '\0';}
+	} else if (i < strlen(keyString)) {
+		return keyString[i];
+	} return '\0';
 }
 
 char getUserInput(void) {
