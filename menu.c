@@ -3,6 +3,7 @@
 #include <termios.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #define COLOR(s) "\e[96m" s "\e[39m"
 #define BOLD(s) "\e[1m" s "\e[22m"
@@ -26,7 +27,6 @@ const char *findOption(struct Option *options, char c);
 void die(const char *s);
 void freeOptions(struct Option *options);
 
-// -s: (don't) skip if only one option is present
 // -S: skip verbosely if only one options is present
 // -d: display this string at the top of the menu if the menu is printed
 // -c: use this string to map characters to options instead of the default getKeyFromIndex
@@ -34,6 +34,7 @@ int main(int argc, char *argv[]) {
 	// options
 	outOfKeysCallback ook = printOutOfKeysError;
 	const char *outputTerminator = "\n";
+	bool skipIfOneOption = false;
 
 	// arguments
 	for(int i = 1; i < argc; i++) {
@@ -41,6 +42,9 @@ int main(int argc, char *argv[]) {
 			outputTerminator = "";
 		else if (!strcmp(argv[i], "-q") || !strcmp(argv[i], "--quit-on-full"))
 			ook = NULL;
+		else if (!strcmp(argv[i], "-s") || !strcmp(argv[i], "--skip"))
+			skipIfOneOption = 1;
+
 	}
 
 	struct Option *options = getOptions(ook);
@@ -49,7 +53,7 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 	//if there is only one option, output it and skip user selection
-	if (! options->next) {
+	if (! options->next && skipIfOneOption) {
 		printf("%s\n", options->text);
 		return 0;
 	}
