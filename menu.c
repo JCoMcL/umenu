@@ -27,7 +27,6 @@ const char *findOption(struct Option *options, char c);
 void die(const char *s);
 void freeOptions(struct Option *options);
 
-// -S: skip verbosely if only one options is present
 // -d: display this string at the top of the menu if the menu is printed
 // -c: use this string to map characters to options instead of the default getKeyFromIndex
 int main(int argc, char *argv[]) {
@@ -35,6 +34,7 @@ int main(int argc, char *argv[]) {
 	outOfKeysCallback ook = printOutOfKeysError;
 	const char *outputTerminator = "\n";
 	bool skipIfOneOption = false;
+	bool verboseSkip = false;
 
 	// arguments
 	for(int i = 1; i < argc; i++) {
@@ -43,8 +43,11 @@ int main(int argc, char *argv[]) {
 		else if (!strcmp(argv[i], "-q") || !strcmp(argv[i], "--quit-on-full"))
 			ook = NULL;
 		else if (!strcmp(argv[i], "-s") || !strcmp(argv[i], "--skip"))
-			skipIfOneOption = 1;
-
+			skipIfOneOption = true;
+		else if (!strcmp(argv[i], "-S") || !strcmp(argv[i], "--skip-verbosely")) {
+			skipIfOneOption = true;
+			verboseSkip = true;
+		}
 	}
 
 	struct Option *options = getOptions(ook);
@@ -54,6 +57,8 @@ int main(int argc, char *argv[]) {
 	}
 	//if there is only one option, output it and skip user selection
 	if (! options->next && skipIfOneOption) {
+		if(verboseSkip)
+			fprintf(stderr, "Only one option; skipping user selection\n");
 		printf("%s\n", options->text);
 		return 0;
 	}
