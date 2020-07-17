@@ -30,7 +30,7 @@ void freeOptions(struct Option *options);
 // -d: display this string at the top of the menu if the menu is printed
 int main(int argc, char *argv[]) {
 	// options
-	const char *keyString = "1234567890abcdefghijklmnopqrstuvwxyz";
+	const char *keyString = NULL
 	outOfKeysCallback ook = printOutOfKeysError;
 	const char *outputTerminator = "\n";
 	bool skipIfOneOption = false;
