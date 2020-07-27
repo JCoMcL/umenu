@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <getopt.h>
 
 #define COLOR(s) "\e[96m" s "\e[39m"
 #define BOLD(s) "\e[1m" s "\e[22m"
@@ -27,6 +28,15 @@ const char *findOption(struct Option *options, char c);
 void die(const char *s);
 void freeOptions(struct Option *options);
 
+static const struct option longopts[] = {
+	{ "display", 1, 0, 'd' },
+	{ "keys", 1, 0, 'k' },
+	{ "no-newline", 0, 0, 'n' },
+	{ "quit-on-full", 0, 0, 'q' },
+	{ "skip", 0, 0, 's' },
+	{ "skip-verbosely", 0, 0, 'S' }
+};
+
 int main(int argc, char *argv[]) {
 	// options
 	const char *displayString = "";
@@ -37,22 +47,28 @@ int main(int argc, char *argv[]) {
 	bool verboseSkip = false;
 
 	// arguments
-	for(int i = 1; i < argc; i++) {
-		if (!strcmp(argv[i], "-d") || !strcmp(argv[i], "--display")){
-			if (i != argc)
-				displayString = argv[++i];
-		} else if (!strcmp(argv[i], "-k") || !strcmp(argv[i], "--keys")){
-			if (i != argc)
-				keyString = argv[++i];
-		} else if (!strcmp(argv[i], "-n") || !strcmp(argv[i], "--no-newline"))
+	int ch;
+	while ((ch = getopt_long(argc, argv, "d:k:nqsS", longopts, NULL)) != EOF) {
+		switch (ch) {
+		case 'd':
+			displayString = optarg;
+			break;
+		case 'k':
+			keyString = optarg;
+			break;
+		case 'n':
 			outputTerminator = "";
-		else if (!strcmp(argv[i], "-q") || !strcmp(argv[i], "--quit-on-full"))
+			break;
+		case 'q':
 			ook = NULL;
-		else if (!strcmp(argv[i], "-s") || !strcmp(argv[i], "--skip"))
+			break;
+		case 's':
 			skipIfOneOption = true;
-		else if (!strcmp(argv[i], "-S") || !strcmp(argv[i], "--skip-verbosely")) {
+			break;
+		case 'S':
 			skipIfOneOption = true;
 			verboseSkip = true;
+			break;
 		}
 	}
 
