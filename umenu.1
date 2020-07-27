@@ -3,10 +3,43 @@
 umenu \- single\-keypress menu
 .SH SYNOPSIS
 .B umenu
+.RB [ \-nqsSvV ]
+.RB [ \-d
+.IR MESSAGE ]
+.RB [ \-k
+.IR KEYS ]
 .SH DESCRIPTION
 .B umenu
-reads newline-separated items from stdin and assigns a keyboard key to each item. By default, the keys 1-9, 0, a-z are used. If the number of items read in from stdin exceeds the number of available keys (35 by default), all items after the maximum will be excluded. When a key is pressed which matches an available option, the corresponding option is written to stdout and the program terminates. 
-If only one line of stdin is present, umenu prints that line and exits without prompting the user for input. If no options are present, umenu exits with code 1.
+reads newline-separated items from stdin and assigns a keyboard key to each item. By default, the keys 1-9, 0, a-z are used. When a key is pressed which matches an available option, the corresponding option is written to stdout and the program terminates. 
 .SH OPTIONS
 .TP
-This program currently does not have any options
+.BR \-d " ," \-\-display =\fIMESSAGE\fR
+Display this message above the menu. Won't be displayed if the user selection process is skipped (with
+.B \-s
+for example).
+.TP
+.BR \-k ", " \-\-keys =\fIKEYS\fR
+Source the keys for each option from this string
+.TP
+.BR \-n ", " \-\-no\-newline
+Do not print the newline after after output
+.TP
+.BR \-q ", " \-\-quit\-on\-full
+Exit with status 1 if the number of options to display exceeds the number of available keys
+.TP
+.BR \-s ", " \-\-skip
+If only one option is present, skip user selection process
+.TP
+.BR \-S ", " \-\-no\-skip
+Inverse of
+.B \-s
+.TP
+.BR \-v ", " \-\-verbose
+Print additional information at runtime
+.TP
+.BR \-V ", " \-\-no\-verbose
+Inverse of
+.B \-v
+.SH BUGS
+(https://github.com/jcomcl/umenu/issues)
+
