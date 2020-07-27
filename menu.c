@@ -34,7 +34,9 @@ static const struct option longopts[] = {
 	{ "no-newline", 0, 0, 'n' },
 	{ "quit-on-full", 0, 0, 'q' },
 	{ "skip", 0, 0, 's' },
-	{ "skip-verbosely", 0, 0, 'S' }
+	{ "no-skip", 0, 0, 'S' },
+	{ "verbose", 0, 0, 'v' },
+	{ "no-verbose", 0, 0, 'V' }
 };
 
 int main(int argc, char *argv[]) {
@@ -44,11 +46,11 @@ int main(int argc, char *argv[]) {
 	outOfKeysCallback ook = printOutOfKeysError;
 	const char *outputTerminator = "\n";
 	bool skipIfOneOption = false;
-	bool verboseSkip = false;
+	bool verbose = false;
 
 	// arguments
 	int ch;
-	while ((ch = getopt_long(argc, argv, "d:k:nqsS", longopts, NULL)) != EOF) {
+	while ((ch = getopt_long(argc, argv, "d:k:nqsSvV", longopts, NULL)) != EOF) {
 		switch (ch) {
 		case 'd':
 			displayString = optarg;
@@ -66,8 +68,13 @@ int main(int argc, char *argv[]) {
 			skipIfOneOption = true;
 			break;
 		case 'S':
-			skipIfOneOption = true;
-			verboseSkip = true;
+			skipIfOneOption = false;
+			break;
+		case 'v':
+			verbose = true;
+			break;
+		case 'V':
+			verbose = false;
 			break;
 		}
 	}
@@ -79,7 +86,7 @@ int main(int argc, char *argv[]) {
 	}
 	//if there is only one option, output it and skip user selection
 	if (! options->next && skipIfOneOption) {
-		if(verboseSkip)
+		if(verbose)
 			fprintf(stderr, "Only one option; skipping user selection\n");
 		printf("%s\n", options->text);
 		return 0;
