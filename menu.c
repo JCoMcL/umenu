@@ -84,7 +84,6 @@ int main(int argc, char *argv[]) {
 	if (! options) {
 		return 1;
 	}
-	//if there is only one option, output it and skip user selection
 	if (! options->next && skipIfOneOption) {
 		if(verbose)
 			fprintf(stderr, "Only one option; skipping user selection\n");

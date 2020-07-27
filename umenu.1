@@ -40,6 +40,33 @@ Print additional information at runtime
 .BR \-V ", " \-\-no\-verbose
 Inverse of
 .B \-v
+.SH EXAMPLES
+Navigate to a subdirectory:
+.PP
+.nf
+.RS
+cd $( ls -d */ | umenu )
+.RE
+.fi
+.PP
+Confirm an action:
+.PP
+.nf
+.PP
+.RS
+echo "yes, delete $FILE\\n no, keep $FILE" |
+umenu -k yn -d "delete $FILE?" |
+grep -Gq "^n" || rm $FILE
+.RE
+.fi
+.PP
+Use another menu program if umenu can't display all options:
+.PP
+.nf
+.RS
+{ umenu -q || dmenu } < options 
+.RE
+.fi
 .SH BUGS
 (https://github.com/jcomcl/umenu/issues)
 
