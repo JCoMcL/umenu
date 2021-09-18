@@ -170,9 +170,8 @@ char getKeyFromIndex(int i, const char *keyString) {
 
 char getUserInput(void) {
 	/* reopen stdin for user input */
-	if (freopen("/dev/tty", "r", stdin) == NULL) {
+	if (freopen("/dev/tty", "r", stdin) == NULL)
 		die("Can't reopen tty.");
-	}
 	
 	struct termios tio_old;
 	tcgetattr(0, &tio_old);
@@ -195,11 +194,11 @@ char getUserInput(void) {
 const char *findOption(struct Option *options, char c) {
 	struct Option *o;
 	for (o = options; o != NULL && (o->key != c); o = o->next) {}
-	if (o != NULL) {
+	if (o != NULL)
 		return o->text;
-	} else {
+	else
 		return NULL;
-}	}
+}
 
 void die(const char *s) {
 	if(s) { fprintf(stderr, RED("%s\n"), s);}
