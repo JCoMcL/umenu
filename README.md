@@ -1,11 +1,11 @@
 # umenu
 #### *micro-menu* or *unnamed menu*
-A simple menu (à-la dmenu or slmenu) designed around a single-keypress mantra. It maps each line of stdin (up to a maximum of 35) to a key and outputs the selected line to stdout.
+Inspired by dmenu and slmenu, but designed around single-keypress interaction. It maps each line of stdin (up to a maximum of 35 by default) to a key and outputs the selected line to stdout.
 Useful for repetitive user-input tasks like categorising training data or or organising media into directories.
 ## Installation
 run `make install` from the source directory (with root if neccesary)
+no dependencies should be required
 
-or install from the [AUR](https://aur.archlinux.org/umenu.git) for Arch users
 ## Example usage
 Navigate to a subdirectory:
 ```shell
