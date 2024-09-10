@@ -137,8 +137,10 @@ static const struct option longopts[] = {
 	{ "skip", 0, 0, 's' },
 	{ "no-skip", 0, 0, 'S' },
 	{ "verbose", 0, 0, 'v' },
-	{ "no-verbose", 0, 0, 'V' }
+	{ "no-verbose", 0, 0, 'V' },
+	{ "help", 0, 0, 'h' }
 };
+
 
 int main(int argc, char *argv[]) {
 	// options
@@ -146,12 +148,12 @@ int main(int argc, char *argv[]) {
 	const char *keyString = NULL;
 	outOfKeysCallback ook = printOutOfKeysError;
 	const char *outputTerminator = "\n";
-	bool skipIfOneOption = false;
+	bool skipIfOneOption = true;
 	bool verbose = false;
 
 	// arguments
 	int ch;
-	while ((ch = getopt_long(argc, argv, "d:k:nqsSvV", longopts, NULL)) != EOF) {
+	while ((ch = getopt_long(argc, argv, "d:k:nqsSvVh", longopts, NULL)) != EOF) {
 		switch (ch) {
 		case 'd':
 			displayString = optarg;
@@ -177,6 +179,19 @@ int main(int argc, char *argv[]) {
 		case 'V':
 			verbose = false;
 			break;
+		case 'h':
+			printf("Usage: %s [options]\n", argv[0]);
+			puts("Select a line from standard input with a keypress.\n");
+			puts("  -d, --display <string>    The message to display above the menu (if not skipped)");
+			puts("  -k, --key <string>        The keys for each repsective option (e.g. \"yn\", \"12345\")");
+			puts("  -n, --no-newline          Do not print a newline after output");
+			puts("  -q, --quit-on-full        Die upon running out of keys rather than trimming the input");
+			puts("  -s, --skip                Don't prompt user if only one option exists. (default)");
+			puts("  -S, --no-skip             Always prompt user, even if only one option exists");
+			puts("  -v, --verbose             Enable verbose output");
+			puts("  -V, --no-verbose          Disable verbose output");
+			puts("  -h, --help                Display this help messagen");
+			return 0;  // Exit after displaying the help message
 		}
 	}
 
