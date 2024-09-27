@@ -19,14 +19,12 @@ struct Option {
 typedef struct Option *(*outOfKeysCallback)(struct Option*);
 
 char getKeyFromIndex(int i, const char *keyString) {
-	if (!keyString) {
-		if (i < 9) {		return '1' + i;} //chars '1'-'9'
-		else if (i == 9) {	return '0';}
-		else if (i < 36) {	return 'a' + i - 10;} //chars 'a'-'z'
-		else {			return '\0';}
-	} else if (i < strlen(keyString))
-		return keyString[i];
-	return '\0';
+	/* traversing the string ourselves as it's slightly more effiecient than using strlen*/
+	for(int j=0; j<i; j++) {
+		if (keyString[j] == '\0')
+			return '\0';
+	}
+	return keyString[i];
 }
 
 void freeOptions(struct Option *options) {
@@ -143,7 +141,7 @@ static const struct option longopts[] = {
 int main(int argc, char *argv[]) {
 	// options
 	const char *displayString = "";
-	const char *keyString = NULL;
+	const char *keyString = "0123456789abcdefghijklmnoopqrstuvwxyz";
 	outOfKeysCallback ook = printOutOfKeysError;
 	const char *outputTerminator = "\n";
 	bool skipIfOneOption = true;
@@ -189,7 +187,7 @@ int main(int argc, char *argv[]) {
 			puts("  -v, --verbose             Enable verbose output");
 			puts("  -V, --no-verbose          Disable verbose output");
 			puts("  -h, --help                Display this help messagen");
-			return 0;  // Exit after displaying the help message
+			return 0;
 		}
 	}
 
