@@ -3,7 +3,7 @@
 umenu \- single\-keypress menu
 .SH SYNOPSIS
 .B umenu
-.RB [ \-nqsSvV ]
+.RB [ \-nqsSh ]
 .RB [ \-d
 .IR MESSAGE ]
 .RB [ \-k
@@ -14,9 +14,7 @@ reads newline-separated items from stdin and assigns a keyboard key to each item
 .SH OPTIONS
 .TP
 .BR \-d " ," \-\-display =\fIMESSAGE\fR
-Display this message above the menu. Won't be displayed if the user selection process is skipped (with
-.B \-s
-, for example).
+Display this message above the menu. Won't be displayed if the user selection process is skipped
 .TP
 .BR \-k ", " \-\-keys =\fIKEYS\fR
 Source the keys for each option from this string
@@ -28,18 +26,11 @@ Do not print the newline after after output
 Exit with status 1 if the number of options to display exceeds the number of available keys
 .TP
 .BR \-s ", " \-\-skip
-If only one option is present, skip user selection process
+If only one option is present, skip user selection process. This is the default.
 .TP
 .BR \-S ", " \-\-no\-skip
 Inverse of
 .B \-s
-.TP
-.BR \-v ", " \-\-verbose
-Print additional information at runtime
-.TP
-.BR \-V ", " \-\-no\-verbose
-Inverse of
-.B \-v
 .SH EXAMPLES
 Navigate to a subdirectory:
 .PP

@@ -132,8 +132,6 @@ static const struct option longopts[] = {
 	{ "quit-on-full", 0, 0, 'q' },
 	{ "skip", 0, 0, 's' },
 	{ "no-skip", 0, 0, 'S' },
-	{ "verbose", 0, 0, 'v' },
-	{ "no-verbose", 0, 0, 'V' },
 	{ "help", 0, 0, 'h' }
 };
 
@@ -141,15 +139,14 @@ static const struct option longopts[] = {
 int main(int argc, char *argv[]) {
 	// options
 	const char *displayString = "";
-	const char *keyString = "0123456789abcdefghijklmnoopqrstuvwxyz";
+	const char *keyString = "1234567890abcdefghijklmnoopqrstuvwxyz";
 	outOfKeysCallback ook = printOutOfKeysError;
 	const char *outputTerminator = "\n";
 	bool skipIfOneOption = true;
-	bool verbose = false;
 
 	// arguments
 	int ch;
-	while ((ch = getopt_long(argc, argv, "d:k:nqsSvVh", longopts, NULL)) != EOF) {
+	while ((ch = getopt_long(argc, argv, "d:k:nqsSh", longopts, NULL)) != EOF) {
 		switch (ch) {
 		case 'd':
 			displayString = optarg;
@@ -169,12 +166,6 @@ int main(int argc, char *argv[]) {
 		case 'S':
 			skipIfOneOption = false;
 			break;
-		case 'v':
-			verbose = true;
-			break;
-		case 'V':
-			verbose = false;
-			break;
 		case 'h':
 			printf("Usage: %s [options]\n", argv[0]);
 			puts("Select a line from standard input with a keypress.\n");
@@ -184,8 +175,6 @@ int main(int argc, char *argv[]) {
 			puts("  -q, --quit-on-full        Die upon running out of keys rather than trimming the input");
 			puts("  -s, --skip                Don't prompt user if only one option exists. (default)");
 			puts("  -S, --no-skip             Always prompt user, even if only one option exists");
-			puts("  -v, --verbose             Enable verbose output");
-			puts("  -V, --no-verbose          Disable verbose output");
 			puts("  -h, --help                Display this help messagen");
 			return 0;
 		}
@@ -196,8 +185,6 @@ int main(int argc, char *argv[]) {
 	if (! options)
 		return 1;
 	if (! options->next && skipIfOneOption) {
-		if(verbose)
-			fprintf(stderr, "Only one option; skipping user selection\n");
 		printf("%s\n", options->text);
 		return 0;
 	}

@@ -5,7 +5,7 @@ umenu: umenu.c
 	$(CC) -o $@ $<
 
 %.gz: %
-	gzip -k $<
+	gzip -fk $<
 
 install: umenu umenu.1.gz
 	mkdir -p  $(DESTDIR)$(PREFIX)/bin
