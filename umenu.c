@@ -24,9 +24,9 @@ char getKeyFromIndex(int i, const char *keyString) {
 		else if (i == 9) {	return '0';}
 		else if (i < 36) {	return 'a' + i - 10;} //chars 'a'-'z'
 		else {			return '\0';}
-	} else if (i < strlen(keyString)) {
+	} else if (i < strlen(keyString))
 		return keyString[i];
-	} return '\0';
+	return '\0';
 }
 
 void freeOptions(struct Option *options) {
@@ -50,17 +50,15 @@ struct Option *getOptions(outOfKeysCallback ook, const char *keyString) {
 	for (int i = 0; fgets(buf, sizeof buf, stdin); i++) {
 		/* remove trailing newline */
 		char *p = strchr(buf, '\n');
-		if (p) {
+		if (p)
 			*p = '\0';
-		}
 
 		char key = getKeyFromIndex(i, keyString);
 		if (!key){
-			if (ook == NULL) {
+			if (ook == NULL)
 				die(NULL);
-			} else {
+			else
 				return ook(options);
-			}
 		}
 
 		struct Option *curr = malloc(sizeof(struct Option));
@@ -74,9 +72,9 @@ struct Option *getOptions(outOfKeysCallback ook, const char *keyString) {
 		curr->next = NULL;
 
 		if (prev)
-			{prev->next = curr;}
+			prev->next = curr;
 		else
-			{options = curr;} //first iteration; assign curr as the list head
+			options = curr; //first iteration; assign curr as the list head
 		
 		prev = curr;
 	}
@@ -197,9 +195,8 @@ int main(int argc, char *argv[]) {
 
 	struct Option *options = getOptions(ook, keyString);
 
-	if (! options) {
+	if (! options)
 		return 1;
-	}
 	if (! options->next && skipIfOneOption) {
 		if(verbose)
 			fprintf(stderr, "Only one option; skipping user selection\n");
@@ -212,9 +209,8 @@ int main(int argc, char *argv[]) {
 	displayOptions(options);
 	const char *output;
 
-	for (char c = getUserInput(); !(output=findOption(options, c)); c = getUserInput()) {
+	for (char c = getUserInput(); !(output=findOption(options, c)); c = getUserInput())
 		fprintf(stderr, "Invalid Character: %c\n", c);
-	}
 	fprintf(stdout, "%s%s", output, outputTerminator);
 	freeOptions(options);
 	return 0;
