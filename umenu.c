@@ -62,7 +62,7 @@ struct Option *getOptions(outOfKeysCallback ook, const char *keyString) {
 		struct Option *curr = malloc(sizeof(struct Option));
 		if (!curr) {
 			if (options)
-				{freeOptions(options);}
+				freeOptions(options);
 			die("Can't malloc");
 		}
 		curr->key = key;
@@ -92,27 +92,27 @@ void displayOptions(struct Option *options) {
 	}
 }
 
-
 char getUserInput(void) {
 	/* reopen stdin for user input */
 	if (freopen("/dev/tty", "r", stdin) == NULL)
 		die("Can't reopen tty.");
 	
-	struct termios tio_old;
-	tcgetattr(0, &tio_old);
-	struct termios tio_new = tio_old;
+	struct termios saved_settings;
+	tcgetattr(0, &saved_settings);
+
+	struct termios required_settings = saved_settings;
 	/* disable unwanted attributes */
-	tio_new.c_lflag &= ~(
+	required_settings.c_lflag &= ~(
 		ICANON| //reads input per line rather than per character
 		ECHO //echoes the typed input
 	); 
-	tio_new.c_cc[VMIN]=1; //require minimum of 1 char
+	required_settings.c_cc[VMIN]=1; //require minimum of 1 char
 
-	tcsetattr(0, TCSANOW, &tio_new);
+	tcsetattr(0, TCSANOW, &required_settings);
 
 	char c;
 	read(0, &c, 1);
-	tcsetattr(0, TCSANOW, &tio_old);
+	tcsetattr(0, TCSANOW, &saved_settings);
 	return c;
 }
 
@@ -134,7 +134,6 @@ static const struct option longopts[] = {
 	{ "no-skip", 0, 0, 'S' },
 	{ "help", 0, 0, 'h' }
 };
-
 
 int main(int argc, char *argv[]) {
 	// options
