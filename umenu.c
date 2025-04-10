@@ -132,20 +132,27 @@ static const struct option longopts[] = {
 	{ "quit-on-full", 0, 0, 'q' },
 	{ "skip", 0, 0, 's' },
 	{ "no-skip", 0, 0, 'S' },
+	{ "yes", 0, 0, 'y' },
 	{ "help", 0, 0, 'h' }
+};
+enum Mode {
+	NORMAL,
+	YES
 };
 
 int main(int argc, char *argv[]) {
 	// options
+	int mode = NORMAL;
 	const char *displayString = "";
 	const char *keyString = "1234567890abcdefghijklmnoopqrstuvwxyz";
 	outOfKeysCallback ook = printOutOfKeysError;
 	const char *outputTerminator = "\n";
 	bool skipIfOneOption = true;
 
+
 	// arguments
 	int ch;
-	while ((ch = getopt_long(argc, argv, "d:k:nqsSh", longopts, NULL)) != EOF) {
+	while ((ch = getopt_long(argc, argv, "d:k:nqsSyh", longopts, NULL)) != EOF) {
 		switch (ch) {
 		case 'd':
 			displayString = optarg;
@@ -165,6 +172,10 @@ int main(int argc, char *argv[]) {
 		case 'S':
 			skipIfOneOption = false;
 			break;
+		case 'y':
+			mode = YES;
+			skipIfOneOption = false;
+			break;
 		case 'h':
 			printf("Usage: %s [options]\n", argv[0]);
 			puts("Select a line from standard input with a keypress.\n");
@@ -174,12 +185,15 @@ int main(int argc, char *argv[]) {
 			puts("  -q, --quit-on-full        Die upon running out of keys rather than trimming the input");
 			puts("  -s, --skip                Don't prompt user if only one option exists. (default)");
 			puts("  -S, --no-skip             Always prompt user, even if only one option exists");
+			puts("  -y, --yes                 Only accept 'y', otherwise fail");
 			puts("  -h, --help                Display this help messagen");
 			return 0;
 		}
 	}
 
-	struct Option *options = getOptions(ook, keyString);
+	struct Option *options;
+	struct Option yes_op = {'y', "yes?", NULL};
+	options = (mode == YES) ? &yes_op : getOptions(ook, keyString);
 
 	if (! options)
 		return 1;
@@ -193,8 +207,15 @@ int main(int argc, char *argv[]) {
 	displayOptions(options);
 	const char *output;
 
-	for (char c = getUserInput(); !(output=findOption(options, c)); c = getUserInput())
-		fprintf(stderr, "Invalid Character: %c\n", c);
+
+	for (char c = getUserInput(); !(output=findOption(options, c)); c = getUserInput()) {
+		if (mode == YES)
+			return 1;
+		else
+			fprintf(stderr, "Invalid Character: %c\n", c);
+	}
+	if ( mode == YES )
+		return 0;
 	fprintf(stdout, "%s%s", output, outputTerminator);
 	freeOptions(options);
 	return 0;
