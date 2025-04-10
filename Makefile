@@ -15,7 +15,7 @@ install: umenu umenu.1.gz
 
 uninstall:
 	rm -f $(DESTDIR)$(PREFIX)/bin/umenu
-	rm -f $(DESTDIR)$(MANPREFIX)/man1/umenu.1
+	rm -f $(DESTDIR)$(MANPREFIX)/man1/umenu.1.gz
 
 clean:
 	rm -f umenu *.gz
