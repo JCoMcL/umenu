@@ -4,7 +4,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <getopt.h>
 
 #define COLOR(s) "\e[96m" s "\e[39m"
 #define BOLD(s) "\e[1m" s "\e[22m"
@@ -125,23 +124,49 @@ const char *findOption(struct Option *options, char c) {
 		return NULL;
 }
 
-static const struct option longopts[] = {
-	{ "display", 1, 0, 'd' },
-	{ "keys", 1, 0, 'k' },
-	{ "no-newline", 0, 0, 'n' },
-	{ "quit-on-full", 0, 0, 'q' },
-	{ "skip", 0, 0, 's' },
-	{ "no-skip", 0, 0, 'S' },
-	{ "yes", 0, 0, 'y' },
-	{ "help", 0, 0, 'h' }
+struct CommandOption {
+	char short_opt;		   // Short option character (e.g., 'd')
+	const char *long_opt;	 // Long option string (e.g., "display")
+	const char *description;  // Description for help text
 };
+
+static void help(struct CommandOption *options) {
+	printf("Usage: umenu [options]\n");
+	puts("Select a line from standard input with a keypress.\n");
+	for (const struct CommandOption *opt = options; opt->short_opt != 0; opt++) {
+		printf("  -%c, --%-15s  %s\n", opt->short_opt, opt->long_opt, opt->description);
+	}
+}
+
+struct CommandOption getLongOpt(struct CommandOption *opts, const char *s) {
+	/* strip leading '-'s */
+	for(; s[0] == '-'; s++){}
+
+	/* search until either the first match or the end of the list */
+	for(; opts->long_opt != NULL && strcmp(opts->long_opt,s); opts++){ }
+	return *opts;
+
+}
+void dieUnknownOption(const char *s) {
+	fprintf(stderr, RED("Unknown option: %s\n"), s);
+	exit(1);
+}
+void dieMissingParameter(const char *s) {
+	fprintf(stderr, RED("missing parameter for option %s\n"), s);
+	exit(1);
+}
+char *tryGetParameter(int argc, char *argv[], int i) {
+	if (i >= argc)
+		dieMissingParameter(argv[i-1]);
+	return argv[i];
+}
+
 enum Mode {
 	NORMAL,
 	YES
 };
 
 int main(int argc, char *argv[]) {
-	// options
 	int mode = NORMAL;
 	const char *displayString = "";
 	const char *keyString = "1234567890abcdefghijklmnoopqrstuvwxyz";
@@ -149,16 +174,36 @@ int main(int argc, char *argv[]) {
 	const char *outputTerminator = "\n";
 	bool skipIfOneOption = true;
 
+	struct CommandOption commandOptions[] = {
+		{'d', "display", "The message to display above the menu (if not skipped)"},
+		{'k', "keys", "The keys for each respective option (e.g. \"yn\", \"12345\")"},
+		{'n', "no-newline", "Do not print a newline after output"},
+		{'q', "quit-on-full", "Die upon running out of keys rather than trimming the input"},
+		{'s', "skip", "Don't prompt user if only one option exists (default)"},
+		{'S', "no-skip", "Always prompt user, even if only one option exists"},
+		{'y', "yes", "Only accept 'y', otherwise fail"},
+		{'h', "help", "Display this help message"},
+		{0, NULL, NULL} // Sentinel to mark end of array
+	};
 
-	// arguments
-	int ch;
-	while ((ch = getopt_long(argc, argv, "d:k:nqsSyh", longopts, NULL)) != EOF) {
-		switch (ch) {
+	for (int i = 1; i < argc; i++) {
+		char opt = argv[i][1];
+		char *parameter;
+
+		if (opt == '-'){
+			opt = getLongOpt(commandOptions, argv[i]).short_opt;
+		};
+
+		if (opt == 0)
+			dieUnknownOption(argv[i]) ;
+
+		#define nextarg tryGetParameter(argc, argv, ++i)
+		switch(opt) {
 		case 'd':
-			displayString = optarg;
+			displayString = nextarg;
 			break;
 		case 'k':
-			keyString = optarg;
+			keyString = nextarg;
 			break;
 		case 'n':
 			outputTerminator = "";
@@ -177,20 +222,12 @@ int main(int argc, char *argv[]) {
 			skipIfOneOption = false;
 			break;
 		case 'h':
-			printf("Usage: %s [options]\n", argv[0]);
-			puts("Select a line from standard input with a keypress.\n");
-			puts("  -d, --display <string>    The message to display above the menu (if not skipped)");
-			puts("  -k, --key <string>        The keys for each repsective option (e.g. \"yn\", \"12345\")");
-			puts("  -n, --no-newline          Do not print a newline after output");
-			puts("  -q, --quit-on-full        Die upon running out of keys rather than trimming the input");
-			puts("  -s, --skip                Don't prompt user if only one option exists. (default)");
-			puts("  -S, --no-skip             Always prompt user, even if only one option exists");
-			puts("  -y, --yes                 Only accept 'y', otherwise fail");
-			puts("  -h, --help                Display this help messagen");
+			help(commandOptions);
 			return 0;
 		}
-	}
+		#undef nextarg
 
+	}
 	struct Option *options;
 	struct Option yes_op = {'y', "yes?", NULL};
 	options = (mode == YES) ? &yes_op : getOptions(ook, keyString);
