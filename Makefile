@@ -1,4 +1,4 @@
-PREFIX = /usr
+PREFIX = $${HOME}/.local
 MANPREFIX = $(PREFIX)/share/man
 
 umenu: umenu.c
